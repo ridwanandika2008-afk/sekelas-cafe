@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 520">
+  <rect width="400" height="520" rx="16" fill="#ffffff"/>
+  <rect x="16" y="16" width="368" height="488" rx="10" fill="none" stroke="#4A3220" stroke-width="2"/>
+  <!-- Header QRIS -->
+  <rect x="32" y="34" width="336" height="56" rx="8" fill="#4A3220"/>
+  <text x="200" y="68" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#D99A4E">QRIS</text>
+  <!-- Placeholder QR pattern -->
+  <g fill="#4A3220">
+    <rect x="48" y="112" width="72" height="72" rx="6"/>
+    <rect x="64" y="128" width="40" height="40" fill="#ffffff"/>
+    <rect x="76" y="140" width="16" height="16"/>
+    <rect x="280" y="112" width="72" height="72" rx="6"/>
+    <rect x="296" y="128" width="40" height="40" fill="#ffffff"/>
+    <rect x="308" y="140" width="16" height="16"/>
+    <rect x="48" y="312" width="72" height="72" rx="6"/>
+    <rect x="64" y="328" width="40" height="40" fill="#ffffff"/>
+    <rect x="76" y="340" width="16" height="16"/>
+  </g>
+  <g fill="#4A3220">
+    <rect x="140" y="112" width="16" height="16"/><rect x="172" y="112" width="16" height="16"/><rect x="204" y="112" width="16" height="16"/><rect x="236" y="112" width="16" height="16"/>
+    <rect x="156" y="128" width="16" height="16"/><rect x="188" y="128" width="16" height="16"/><rect x="220" y="128" width="16" height="16"/>
+    <rect x="140" y="144" width="16" height="16"/><rect x="236" y="144" width="16" height="16"/>
+    <rect x="156" y="160" width="16" height="16"/><rect x="188" y="160" width="16" height="16"/><rect x="220" y="160" width="16" height="16"/>
+    <rect x="140" y="176" width="16" height="16"/><rect x="172" y="176" width="16" height="16"/><rect x="204" y="176" width="16" height="16"/><rect x="236" y="176" width="16" height="16"/>
+    <rect x="48" y="204" width="16" height="16"/><rect x="96" y="204" width="16" height="16"/><rect x="140" y="204" width="16" height="16"/><rect x="188" y="204" width="16" height="16"/><rect x="236" y="204" width="16" height="16"/><rect x="280" y="204" width="16" height="16"/><rect x="328" y="204" width="16" height="16"/>
+    <rect x="72" y="220" width="16" height="16"/><rect x="120" y="220" width="16" height="16"/><rect x="164" y="220" width="16" height="16"/><rect x="212" y="220" width="16" height="16"/><rect x="260" y="220" width="16" height="16"/><rect x="304" y="220" width="16" height="16"/>
+    <rect x="48" y="236" width="16" height="16"/><rect x="96" y="236" width="16" height="16"/><rect x="140" y="236" width="16" height="16"/><rect x="188" y="236" width="16" height="16"/><rect x="236" y="236" width="16" height="16"/><rect x="280" y="236" width="16" height="16"/><rect x="328" y="236" width="16" height="16"/>
+    <rect x="72" y="252" width="16" height="16"/><rect x="120" y="252" width="16" height="16"/><rect x="164" y="252" width="16" height="16"/><rect x="212" y="252" width="16" height="16"/><rect x="260" y="252" width="16" height="16"/><rect x="304" y="252" width="16" height="16"/>
+    <rect x="48" y="268" width="16" height="16"/><rect x="96" y="268" width="16" height="16"/><rect x="140" y="268" width="16" height="16"/><rect x="188" y="268" width="16" height="16"/><rect x="236" y="268" width="16" height="16"/><rect x="280" y="268" width="16" height="16"/><rect x="328" y="268" width="16" height="16"/>
+    <rect x="72" y="284" width="16" height="16"/><rect x="120" y="284" width="16" height="16"/><rect x="164" y="284" width="16" height="16"/><rect x="212" y="284" width="16" height="16"/><rect x="260" y="284" width="16" height="16"/><rect x="304" y="284" width="16" height="16"/>
+    <rect x="140" y="312" width="16" height="16"/><rect x="172" y="312" width="16" height="16"/><rect x="204" y="312" width="16" height="16"/><rect x="236" y="312" width="16" height="16"/><rect x="280" y="312" width="16" height="16"/><rect x="328" y="312" width="16" height="16"/>
+    <rect x="156" y="328" width="16" height="16"/><rect x="220" y="328" width="16" height="16"/><rect x="304" y="328" width="16" height="16"/>
+    <rect x="140" y="344" width="16" height="16"/><rect x="188" y="344" width="16" height="16"/><rect x="260" y="344" width="16" height="16"/><rect x="328" y="344" width="16" height="16"/>
+    <rect x="156" y="360" width="16" height="16"/><rect x="204" y="360" width="16" height="16"/><rect x="288" y="360" width="16" height="16"/>
+    <rect x="140" y="376" width="16" height="16"/><rect x="172" y="376" width="16" height="16"/><rect x="236" y="376" width="16" height="16"/><rect x="296" y="376" width="16" height="16"/>
+  </g>
+  <!-- Info bawah -->
+  <text x="200" y="424" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#4A3220">SEKELAS CAFE</text>
+  <text x="200" y="446" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#8A7663">SMKN 1 Boyolangu</text>
+  <text x="200" y="484" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#8A7663" font-style="italic">Contoh QRIS — unggah QRIS asli di menu Pengaturan</text>
+</svg>

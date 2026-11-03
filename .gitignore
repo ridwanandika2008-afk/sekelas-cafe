@@ -1,0 +1,86 @@
+# ============================================================
+# Sekelas Cafe — .gitignore
+# Sumber template: github/gitignore (Node, Next.js, Vercel)
+# ditambah pengecualian infrastruktur sandbox lokal.
+# ============================================================
+
+# ---- Secrets & environment (JANGAN pernah commit) ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---- Dependencies ----
+node_modules/
+/.pnp
+.pnp.*
+.pnpm-store/
+
+# ---- Build output & cache ----
+/.next/
+/out/
+/build/
+/dist/
+*.tsbuildinfo
+.turbo/
+.eslintcache
+
+# ---- Logs ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev.out.log
+server.log
+
+# ---- Testing & coverage ----
+/coverage/
+.nyc_output/
+
+# ---- Vercel ----
+.vercel/
+
+# ---- Editor & IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- Sistem operasi ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- File lokal & temporary ----
+tmp/
+*.pid
+*.seed
+*.bak
+local-*
+
+# ---- Database lokal (SQLite sisa template; produksi memakai Supabase) ----
+*.sqlite
+*.sqlite3
+*.db
+db/*.db
+
+# ---- Konfigurasi lokal tools AI (tidak dibutuhkan proyek) ----
+.claude/
+.z-ai-config/
+
+# ---- Infrastruktur sandbox pengembangan (bukan bagian dari produk) ----
+/.zscripts/
+/skills/
+/agent-ctx/
+/tool-results/
+/mini-services/
+/examples/
+/download/
+/upload/
+/Caddyfile
+/tests/*.sh
+
+# ---- Next.js ----
+next-env.d.ts

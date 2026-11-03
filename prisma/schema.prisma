@@ -1,0 +1,329 @@
+// ============================================================
+// Sekelas Cafe — Skema Database (Supabase PostgreSQL)
+// Prinsip: harga dalam Rupiah utuh (Int), status sebagai String
+// enum-like agar fleksibel, snapshot data pada item pesanan
+// agar riwayat transaksi tetap utuh walau menu berubah.
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SEKELAS_DATABASE_URL")
+}
+
+// ---------- Pengguna & Akses ----------
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  username     String   @unique
+  passwordHash String
+  role         String   @default("KASIR") // ADMIN | KASIR | BARISTA
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  shifts        Shift[]
+  activities    ActivityLog[]
+  notifications Notification[]
+  processedOrders Order[] @relation("OrderKasir")
+}
+
+// ---------- Menu ----------
+
+model Category {
+  id         String   @id @default(cuid())
+  name       String   @unique
+  sortOrder  Int      @default(0)
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  menuItems MenuItem[]
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  name        String
+  description String?
+  imageUrl    String?
+  price       Int // Rupiah utuh
+  status      String   @default("AVAILABLE") // AVAILABLE | SOLD_OUT | PAUSED | INACTIVE
+  sortOrder   Int      @default(0)
+  isFeatured  Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  optionGroups MenuOptionGroup[]
+  ingredients  MenuItemIngredient[]
+  orderItems   OrderItem[]
+
+  @@index([categoryId])
+  @@index([status, isArchived])
+}
+
+// Kelompok pilihan: Ukuran, Tingkat Gula, Tingkat Es, Topping, dll.
+model MenuOptionGroup {
+  id         String     @id @default(cuid())
+  menuItemId String
+  menuItem   MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  name       String
+  isRequired Boolean    @default(false)
+  maxSelect  Int        @default(1) // 1 = pilih satu, >1 = boleh banyak (topping)
+  sortOrder  Int        @default(0)
+
+  options MenuOption[]
+
+  @@index([menuItemId])
+}
+
+model MenuOption {
+  id          String           @id @default(cuid())
+  groupId     String
+  group       MenuOptionGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name        String
+  priceDelta  Int              @default(0) // tambahan harga Rupiah
+  sortOrder   Int              @default(0)
+  isAvailable Boolean          @default(true)
+
+  @@index([groupId])
+}
+
+// ---------- Pesanan ----------
+
+model Order {
+  id          String   @id @default(cuid())
+  orderNumber String   @unique // SC-YYMMDD-NNN
+  accessKey   String? // kunci akses pelacakan pesanan (pembeli)
+  channel     String   @default("ONLINE") // ONLINE | POS
+  customerName String
+  fulfillment String // DINE_IN | TAKEAWAY | DELIVERY
+  tableNumber String?
+  deliveryBuilding String?
+  deliveryRoom      String?
+  deliveryNote      String?
+  note        String?
+  subtotal    Int
+  deliveryFee Int      @default(0)
+  discount    Int      @default(0)
+  total       Int
+  paymentMethod String? // CASH | QRIS
+  paymentStatus String @default("UNPAID") // UNPAID | PAID | CANCELLED
+  status      String   @default("NEW") // NEW | QUEUED | PREPARING | READY | DELIVERING | COMPLETED | CANCELLED
+  cashReceived Int?
+  cashChange  Int?
+  promoId     String?
+  promo       Promo?   @relation(fields: [promoId], references: [id], onDelete: SetNull)
+  kasirId     String?
+  kasir       User?    @relation("OrderKasir", fields: [kasirId], references: [id], onDelete: SetNull)
+  shiftId     String?
+  shift       Shift?   @relation(fields: [shiftId], references: [id], onDelete: SetNull)
+  paidAt      DateTime?
+  completedAt DateTime?
+  cancelledAt DateTime?
+  cancelReason String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items OrderItem[]
+
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+  @@index([shiftId])
+}
+
+model OrderItem {
+  id           String    @id @default(cuid())
+  orderId      String
+  order        Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId   String?
+  menuItem     MenuItem? @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
+  nameSnapshot String
+  basePrice    Int
+  unitPrice    Int // harga final per unit termasuk variasi
+  qty          Int
+  note         String?
+  optionsJson  String    @default("[]") // snapshot: [{groupId,groupName,optionId,optionName,priceDelta}]
+  isDone       Boolean   @default(false)
+  doneAt       DateTime?
+  sortOrder    Int       @default(0)
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+// Penomoran pesanan harian: SC-YYMMDD-NNN
+model Counter {
+  id  String @id // contoh: "SC-250615"
+  seq Int    @default(0)
+}
+
+// ---------- Stok Bahan Baku ----------
+
+model Ingredient {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  unit      String // gr, ml, pcs, ...
+  stock     Float    @default(0)
+  minStock  Float    @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movements  StockMovement[]
+  menuLinks  MenuItemIngredient[]
+}
+
+model MenuItemIngredient {
+  id           String     @id @default(cuid())
+  menuItemId   String
+  menuItem     MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  amount       Float // jumlah per 1 porsi menu
+
+  @@unique([menuItemId, ingredientId])
+}
+
+model StockMovement {
+  id           String     @id @default(cuid())
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  type         String // IN | OUT | ADJUST
+  amount       Float // selalu positif; arah ditentukan type
+  note         String?
+  orderId      String?
+  userId       String?
+  createdAt    DateTime   @default(now())
+
+  @@index([ingredientId])
+  @@index([createdAt])
+}
+
+// ---------- Promo ----------
+
+model Promo {
+  id        String   @id @default(cuid())
+  name      String
+  type      String // PERCENT | NOMINAL
+  value     Int // PERCENT: 1-100; NOMINAL: Rupiah
+  scope     String   @default("ALL") // ALL | MENU
+  menuItemId String? // untuk scope MENU (string biasa, tanpa relasi ketat)
+  minOrder  Int      @default(0)
+  startsAt  DateTime
+  endsAt    DateTime
+  isActive  Boolean  @default(true)
+  usageCount Int     @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+}
+
+// ---------- Shift & Kas ----------
+
+model Shift {
+  id           String    @id @default(cuid())
+  kasirId      String
+  kasir        User      @relation(fields: [kasirId], references: [id])
+  openedAt     DateTime  @default(now())
+  closedAt     DateTime?
+  openingCash  Int       @default(0)
+  closingCash  Int?
+  cashTotal    Int       @default(0) // total tunai masuk saat penutupan
+  qrisTotal    Int       @default(0)
+  expenseTotal Int       @default(0)
+  expectedCash Int?
+  variance     Int? // selisih kas (closingCash - expectedCash)
+  status       String    @default("OPEN") // OPEN | CLOSED
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  expenses ShiftExpense[]
+  orders   Order[]
+
+  @@index([kasirId])
+  @@index([status])
+}
+
+model ShiftExpense {
+  id        String   @id @default(cuid())
+  shiftId   String
+  shift     Shift    @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  amount    Int
+  note      String?
+  createdAt DateTime @default(now())
+}
+
+// ---------- Pengaturan ----------
+
+model Setting {
+  id               String   @id @default("singleton")
+  cafeName         String   @default("Sekelas Cafe")
+  address          String   @default("Jl. Ki Mangun Sarkoro No.VI/3, Dusun Talun, Beji, Kec. Boyolangu, Kabupaten Tulungagung, Jawa Timur 66233")
+  whatsapp         String   @default("085151823036")
+  heroHeadline     String   @default("Ngopi Asik, Harga Bersahabat")
+  heroSubheadline  String   @default("Kafe siswa-siswi SMKN 1 Boyolangu — segelas semangat di sela jam pelajaran.")
+  heroImageUrl     String   @default("/images/hero-cafe.jpg")
+  aboutText        String?
+  deliveryFee      Int      @default(1000)
+  deliveryEnabled  Boolean  @default(true)
+  qrisImageUrl     String?
+  qrisEnabled      Boolean  @default(true)
+  cashEnabled      Boolean  @default(true)
+  receiptFooter    String   @default("Terima kasih sudah mampir! Simpan struk ini ya.")
+  temporarilyClosed Boolean @default(false)
+  closedMessage    String   @default("Kafe sedang tutup sementara. Pantau terus kabar dari kami ya!")
+  mapQuery         String   @default("SMKN 1 Boyolangu, Tulungagung")
+  updatedAt        DateTime @updatedAt
+}
+
+// Jadwal per hari: 0=Minggu .. 6=Sabtu
+model DaySchedule {
+  dayOfWeek Int     @id
+  isOpen    Boolean @default(true)
+  openTime  String  @default("07:00")
+  closeTime String  @default("14:00")
+}
+
+// ---------- Audit & Notifikasi ----------
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  actorName String? // snapshot nama pelaku
+  role      String?
+  action    String // ORDER_CREATE, PAYMENT_CASH, MENU_UPDATE, ...
+  entity    String?
+  entityId  String?
+  detail    String? // JSON string
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String? // ditujukan ke user tertentu
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String? // broadcast ke role: ADMIN | KASIR | BARISTA
+  type      String // NEW_ORDER | PAYMENT_CONFIRMED | ORDER_QUEUED | ORDER_READY | LOW_STOCK | ORDER_CANCELLED | DELIVERY
+  title     String
+  message   String
+  orderId   String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead, createdAt])
+  @@index([role])
+}
