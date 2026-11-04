@@ -24,7 +24,7 @@ Dokumentasi perkembangan proyek platform manajemen kafe **Sekelas Cafe** (SMKN 1
 8. **Stok bahan sederhana:** resep per menu (`MenuItemIngredient`), pengurangan otomatis saat barista menandai item selesai, peringatan bahan hampir habis ke admin.
 9. **Real-time via polling ringan** (5–20 detik) untuk antrean barista & pesanan kasir — cukup andal untuk skala kafe sekolah, tanpa infrastruktur tambahan.
 10. **Nomor pesanan harian** `SC-YYMMDD-NNN` via tabel `Counter` (transaksional).
-11. **Foto menu/hero dihasilkan AI** (image-generation); logo resmi = SVG buatan tangan (`src/components/logo.tsx` + `src/app/icon.svg`).
+11. **Logo resmi dari pemilik** (revisi v1.0.1): dua versi PNG transparan — mark monogram "S"+cangkir (`public/images/logo-mark.png`, 429×595) & versi berteks "SEKELAS CAFE · By Esemkita · est 2026" (`public/images/logo-full.png`, 1440×688). Karya logo tidak pernah diubah — favicon (icon.png 512 & apple-icon.png 180) hanya menempatkan mark di kanvas hitam sudut membulat. SVG buatan tangan era v1.0.0 sudah pensiun.
 
 ## Akun Staf (seed)
 
@@ -56,6 +56,7 @@ Dokumentasi perkembangan proyek platform manajemen kafe **Sekelas Cafe** (SMKN 1
 - [x] **Semua modul UI lengkap** — situs publik pembeli (A), POS & pesanan & riwayat & shift kasir (C), antrean barista (D), panel admin lengkap (B), laporan & Excel import/export (E), stok & resep & promo (F).
 - [x] **Verifikasi browser end-to-end** (dev + production) — golden path: menu → keranjang → checkout (promo, harga server-side) → pesanan → bayar kasir (kembalian) → struk → barista checklist → SIAP.
 - [x] **Rilis v1.0.0** — repository GitHub + deployment Vercel production (lihat Log Hari 2).
+- [x] **Rilis v1.0.1** — logo resmi pemilik, jadwal Senin–Jumat, perbaikan bug buka 24 jam (lihat Log Hari 3).
 - [x] Lint bersih (eslint 0 error) + `tsc --noEmit` bersih.
 - [x] Pembersihan data uji + WORKLOG final.
 
@@ -68,6 +69,20 @@ Dokumentasi perkembangan proyek platform manajemen kafe **Sekelas Cafe** (SMKN 1
 - **Prisma di luar folder proyek** (mis. /tmp) me-resolve versi berbeda (v7) — selalu jalankan perintah prisma dari root proyek.
 
 ## Log Harian
+
+### 2026-11-04 (Hari 3) — Revisi v1.0.1: logo resmi, jadwal Senin–Jumat, bug buka 24 jam
+
+**Laporan pemilik & tindakan:**
+1. **Bug "hari ini buka 24 jam (00.00–23.59)"** — akar masalah: baris `dayOfWeek=3` (Rabu) di DB produksi tertinggal `00:00–23:59` dari pengujian verifikasi rilis kemarin (log aktivitas sudah terbersihkan, tak bisa dilacak; form admin & API tervalidasi benar — murni data). Diperbaiki langsung di DB produksi: Senin–Jumat 07:00–14:00, Sabtu & Minggu tutup.
+2. **Hari operasional Senin–Jumat saja** — `prisma/seed.ts` + fallback `getSchedules()` (settings.ts) ikut diselaraskan agar reseed/penyingkiran hari tidak melahirkan hari buka di akhir pekan.
+3. **Logo resmi pemilik** diunggah (2 versi) → menggantikan SVG buatan tangan di semua titik: `LogoMark` (navbar publik, dashboard kasir/barista/admin, section Tentang) & `LogoFull` baru (footer publik + halaman masuk staf). Komponen `logo.tsx` ditulis ulang berbasis aset PNG (mark portrait → sizing tinggi + `w-auto` agar proporsi asli terjaga).
+4. **Footer jam operasional** — teks statis "Setiap hari 07.00–14.00 WIB" (menyesatkan) diganti ringkasan dinamis dari jadwal DB via `scheduleSummary()` (format.ts): grup hari berurutan + merge melingkar Senin–Minggu, cth. "Senin–Jumat 07.00–14.00 WIB"; fallback teks aman bila DB tak terjangkau supaya footer tidak ikut crash.
+
+**Verifikasi (dev & produksi, browser):** tsc/lint bersih; beranda — jadwal Senin–Jumat 07.00–14.00, Sabtu/Minggu "Tutup", Rabu "HARI INI" dengan jam normal, status "Sedang buka sekarang"; footer — logo resmi + jam dinamis + menempel bawah; /masuk — logo resmi; dashboard — mark baru termuat; admin pengaturan — switch Sabtu/Minggu off, Rabu 07:00–14:00; favicon 200; dark mode & mobile 390px aman.
+
+**Deployment v1.0.1:** commit `5315cfb` → `vercel deploy --prod` (token tersimpan aman di `.secrets/`) → https://sekelas-cafe-gamma.vercel.app — verifikasi produksi: API jadwal benar, semua aset logo 200, halaman & dashboard OK.
+
+**Catatan kosmetik (belum ditindak):** sebagian foto menu AI memiliki teks/watermark tercetak di dalam foto (mis. "Es Kopi Susu Gula Aren" tertulis dalam gambar) — bukan bug layout; kandidat regenerasi foto di iterasi berikutnya.
 
 ### 2026-11-04 (Hari 2) — Rilis v1.0.0
 
