@@ -169,7 +169,7 @@ export function DashboardShell({
         <header className="sticky top-0 z-40 border-b bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
           <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
             <Link href="/" className="flex items-center gap-2" aria-label="Beranda Sekelas Cafe">
-              <Logo markClassName="h-7 w-7" compact />
+              <Logo markClassName="h-8" compact />
               <span className="hidden font-display text-lg font-semibold sm:inline">
                 Sekelas <span className="italic text-gold">Cafe</span>
               </span>
@@ -228,7 +228,7 @@ export function DashboardShell({
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar lg:flex">
         <div className="flex h-14 items-center border-b px-4">
           <Link href="/admin" aria-label="Dashboard admin">
-            <Logo markClassName="h-7 w-7" compact />
+            <Logo markClassName="h-8" compact />
           </Link>
           <div className="ml-2 leading-tight">
             <p className="font-display text-sm font-semibold">Sekelas Cafe</p>
@@ -255,7 +255,7 @@ export function DashboardShell({
             <Button variant="ghost" size="icon" aria-label="Buka menu" onClick={() => setMobileOpen(true)}>
               <Menu className="h-5 w-5" />
             </Button>
-            <Logo markClassName="h-6 w-6" compact />
+            <Logo markClassName="h-7" compact />
           </div>
           <div className="hidden lg:block" />
           <UserBlock user={user} onLogout={logout} />
@@ -270,7 +270,7 @@ export function DashboardShell({
             />
             <div className="absolute inset-y-0 left-0 flex w-64 flex-col bg-sidebar shadow-xl">
               <div className="flex h-14 items-center justify-between border-b px-4">
-                <Logo markClassName="h-7 w-7" compact />
+                <Logo markClassName="h-8" compact />
                 <Button variant="ghost" size="icon" aria-label="Tutup menu" onClick={() => setMobileOpen(false)}>
                   <X className="h-5 w-5" />
                 </Button>

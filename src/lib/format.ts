@@ -105,6 +105,68 @@ export function timeToMinutes(t: string): number {
   return (h || 0) * 60 + (m || 0);
 }
 
+export type ScheduleLike = {
+  dayOfWeek: number;
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+};
+
+/**
+ * Ringkasan singkat jadwal operasional dari data DaySchedule.
+ * Cth: "Senin–Jumat 07.00–14.00 WIB", "Setiap hari 07.00–14.00 WIB",
+ * "Senin–Jumat 07.00–14.00 · Minggu 08.00–12.00 WIB".
+ * Hari dikelompokkan berurutan (urutan Senin→Minggu, melingkar) dengan jam sama.
+ */
+export function scheduleSummary(schedules: ScheduleLike[]): string {
+  const byDay = new Map(schedules.map((s) => [s.dayOfWeek, s]));
+  const monFirst = [1, 2, 3, 4, 5, 6, 0];
+  const openDays = monFirst.filter((d) => byDay.get(d)?.isOpen);
+  if (openDays.length === 0) return "Sedang tutup";
+
+  const groups: { days: number[]; openTime: string; closeTime: string }[] = [];
+  for (const d of openDays) {
+    const s = byDay.get(d)!;
+    // Hari sebelumnya dalam urutan Senin→Minggu (pendahulu Minggu(0) adalah Sabtu(6))
+    const prev = d === 0 ? 6 : d - 1;
+    const last = groups[groups.length - 1];
+    if (
+      last &&
+      last.days[last.days.length - 1] === prev &&
+      last.openTime === s.openTime &&
+      last.closeTime === s.closeTime
+    ) {
+      last.days.push(d);
+    } else {
+      groups.push({ days: [d], openTime: s.openTime, closeTime: s.closeTime });
+    }
+  }
+  // Gabungkan melingkar: grup terakhir berakhir Minggu (0) + grup pertama mulai Senin (1)
+  const first = groups[0];
+  const lastG = groups[groups.length - 1];
+  if (
+    groups.length > 1 &&
+    lastG.days[lastG.days.length - 1] === 0 &&
+    first.days[0] === 1 &&
+    lastG.openTime === first.openTime &&
+    lastG.closeTime === first.closeTime
+  ) {
+    first.days = [...lastG.days, ...first.days];
+    groups.pop();
+  }
+
+  const time = (g: { openTime: string; closeTime: string }) =>
+    `${g.openTime.replace(":", ".")}–${g.closeTime.replace(":", ".")}`;
+  const label = (days: number[]) =>
+    days.length === 7
+      ? "Setiap hari"
+      : days.length === 1
+        ? DAY_NAMES[days[0]]
+        : `${DAY_NAMES[days[0]]}–${DAY_NAMES[days[days.length - 1]]}`;
+
+  return `${groups.map((g) => `${label(g.days)} ${time(g)}`).join(" · ")} WIB`;
+}
+
 /** Awal hari WIB (00:00 WIB) sebagai Date UTC — untuk filter "hari ini" */
 export function wibDayStart(d: Date = new Date()): Date {
   const key = wibDateKey(d); // "2025-06-15"

@@ -496,9 +496,11 @@ export function HomeView() {
       {info.aboutText && (
         <section className="grain-bg mt-14 border-y" aria-labelledby="tentang">
           <Reveal className="mx-auto max-w-3xl px-4 py-14 text-center">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-card shadow-sm">
-              <Coffee className="h-6 w-6 text-gold" aria-hidden />
-            </span>
+            <img
+              src="/images/logo-mark.png"
+              alt="Logo Sekelas Cafe"
+              className="mx-auto h-16 w-auto"
+            />
             <h2 id="tentang" className="mt-4 font-display text-2xl font-semibold sm:text-3xl">
               Tentang {info.name}
             </h2>

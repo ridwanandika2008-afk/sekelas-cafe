@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/auth";
-import { Logo } from "@/components/logo";
+import { LogoFull } from "@/components/logo";
 import { LoginForm } from "@/components/login-form";
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default async function MasukPage() {
 
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-6 flex flex-col items-center gap-3 text-center">
-          <Logo className="scale-110" />
+          <LogoFull className="h-20 w-auto max-w-[260px] sm:h-24" />
           <p className="text-sm text-muted-foreground">
             Panel staf Sekelas Cafe — SMKN 1 Boyolangu
           </p>

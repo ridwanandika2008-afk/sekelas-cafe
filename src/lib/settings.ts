@@ -97,14 +97,14 @@ export async function getSchedules(): Promise<DayScheduleRow[]> {
   }
   let schedules = await db.daySchedule.findMany({ orderBy: { dayOfWeek: "asc" } });
   if (schedules.length < 7) {
-    // Pastikan 7 hari terisi
+    // Pastikan 7 hari terisi — default: Senin–Jumat buka 07:00–14:00, akhir pekan tutup
     const have = new Set(schedules.map((s) => s.dayOfWeek));
     for (let d = 0; d <= 6; d++) {
       if (!have.has(d)) {
         schedules.push(
           await db.daySchedule.upsert({
             where: { dayOfWeek: d },
-            create: { dayOfWeek: d, isOpen: true, openTime: "07:00", closeTime: "14:00" },
+            create: { dayOfWeek: d, isOpen: d >= 1 && d <= 5, openTime: "07:00", closeTime: "14:00" },
             update: {},
           })
         );

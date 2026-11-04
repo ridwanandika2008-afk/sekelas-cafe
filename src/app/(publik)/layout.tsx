@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Coffee, Instagram, MapPin, MessageCircle } from "lucide-react";
-import { Logo } from "@/components/logo";
+import { LogoFull } from "@/components/logo";
 import { PublicNavbar } from "@/components/public-navbar";
+import { getSchedules } from "@/lib/settings";
+import { scheduleSummary } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: {
@@ -11,7 +13,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+/** Label jam operasional ringkas dari jadwal terkini; fallback aman bila DB tak terjangkau. */
+async function getHoursLabel(): Promise<string> {
+  try {
+    return scheduleSummary(await getSchedules());
+  } catch {
+    return "Senin–Jumat 07.00–14.00 WIB";
+  }
+}
+
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+  const hoursLabel = await getHoursLabel();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <PublicNavbar />
@@ -20,7 +32,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <footer className="mt-auto border-t bg-card">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-3">
-            <Logo />
+            <LogoFull className="h-14 w-auto sm:h-16" />
             <p className="text-sm leading-relaxed text-muted-foreground">
               Kafe yang dikelola siswa-siswi SMKN 1 Boyolangu. Ngopi asik, harga
               bersahabat, dan antar sampai area sekolah.
@@ -69,7 +81,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </a>
               <span className="inline-flex items-center gap-2 text-muted-foreground">
                 <Coffee className="h-4 w-4 text-gold" />
-                Setiap hari 07.00–14.00 WIB
+                {hoursLabel}
               </span>
               <span className="inline-flex items-center gap-2 text-muted-foreground">
                 <Instagram className="h-4 w-4 text-gold" />

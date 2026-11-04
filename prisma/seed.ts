@@ -49,14 +49,15 @@ async function main() {
     },
     update: {},
   });
+  // Jadwal operasional: Senin(1)–Jumat(5) 07:00–14:00 WIB; Sabtu & Minggu tutup.
   for (let d = 0; d <= 6; d++) {
     await db.daySchedule.upsert({
       where: { dayOfWeek: d },
-      create: { dayOfWeek: d, isOpen: true, openTime: "07:00", closeTime: "14:00" },
+      create: { dayOfWeek: d, isOpen: d >= 1 && d <= 5, openTime: "07:00", closeTime: "14:00" },
       update: {},
     });
   }
-  console.log("✓ Pengaturan & jadwal 7 hari");
+  console.log("✓ Pengaturan & jadwal (Senin–Jumat 07:00–14:00)");
 
   // ---------- Kategori ----------
   const kategoriDefs = [
