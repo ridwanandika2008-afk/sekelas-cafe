@@ -8,7 +8,27 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { LayoutDashboard, LogOut, Menu, Moon, Sun, X } from "lucide-react";
+import {
+  BarChart3,
+  Boxes,
+  ClipboardList,
+  Coffee,
+  FileSpreadsheet,
+  History,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Moon,
+  Percent,
+  Settings,
+  ShoppingBasket,
+  Sun,
+  Tags,
+  Timer,
+  UtensilsCrossed,
+  Users,
+  X,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
@@ -17,6 +37,34 @@ import { ROLE_LABEL } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 
 export type NavItem = { href: string; label: string; icon: LucideIcon };
+
+export type ShellSection = "kasir" | "barista" | "admin";
+
+/**
+ * Konfigurasi navigasi HIDUP di module client — komponen ikon tidak boleh
+ * melewati batas Server → Client Component (RSC serialization).
+ */
+const SECTION_NAV: Record<ShellSection, NavItem[]> = {
+  kasir: [
+    { href: "/kasir", label: "POS Kasir", icon: ShoppingBasket },
+    { href: "/kasir/pesanan", label: "Pesanan Masuk", icon: ClipboardList },
+    { href: "/kasir/riwayat", label: "Riwayat", icon: History },
+    { href: "/kasir/shift", label: "Shift Kas", icon: Timer },
+  ],
+  barista: [{ href: "/barista", label: "Antrean Dapur", icon: Coffee }],
+  admin: [
+    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
+    { href: "/admin/kategori", label: "Kategori", icon: Tags },
+    { href: "/admin/stok", label: "Stok & Bahan", icon: Boxes },
+    { href: "/admin/promo", label: "Promo", icon: Percent },
+    { href: "/admin/laporan", label: "Laporan", icon: BarChart3 },
+    { href: "/admin/data", label: "Data (Excel)", icon: FileSpreadsheet },
+    { href: "/admin/pengguna", label: "Pengguna", icon: Users },
+    { href: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
+    { href: "/admin/aktivitas", label: "Aktivitas", icon: History },
+  ],
+};
 
 function NavLinks({
   nav,
@@ -91,15 +139,16 @@ function UserBlock({
 
 export function DashboardShell({
   variant,
-  nav,
+  section,
   user,
   children,
 }: {
   variant: "sidebar" | "top";
-  nav: NavItem[];
+  section: ShellSection;
   user: { name: string; role: string };
   children: React.ReactNode;
 }) {
+  const nav = SECTION_NAV[section];
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);

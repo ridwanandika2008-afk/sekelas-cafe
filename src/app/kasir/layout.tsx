@@ -1,15 +1,7 @@
 import { redirect } from "next/navigation";
-import { ClipboardList, History, ShoppingBasket, Timer } from "lucide-react";
 import { getSession } from "@/lib/auth";
 import { canAccess } from "@/lib/api-guard";
-import { DashboardShell, type NavItem } from "@/components/dashboard-shell";
-
-const NAV: NavItem[] = [
-  { href: "/kasir", label: "POS Kasir", icon: ShoppingBasket },
-  { href: "/kasir/pesanan", label: "Pesanan Masuk", icon: ClipboardList },
-  { href: "/kasir/riwayat", label: "Riwayat", icon: History },
-  { href: "/kasir/shift", label: "Shift Kas", icon: Timer },
-];
+import { DashboardShell } from "@/components/dashboard-shell";
 
 export default async function KasirLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -19,7 +11,7 @@ export default async function KasirLayout({ children }: { children: React.ReactN
   return (
     <DashboardShell
       variant="top"
-      nav={NAV}
+      section="kasir"
       user={{ name: session.name, role: session.role }}
     >
       {children}
